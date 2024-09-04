@@ -1,0 +1,5 @@
+nbconvert[webpdf]
+jupyter
+sympy
+numpy
+matplotlib
