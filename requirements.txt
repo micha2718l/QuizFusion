@@ -3,3 +3,5 @@ jupyter
 sympy
 numpy
 matplotlib
+pint
+textual
