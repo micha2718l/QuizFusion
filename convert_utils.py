@@ -65,6 +65,16 @@ def export_html(notebook, resources, name):
 
 def export(notebook, name, resources={}, pdf=True, html=False):
     print(f"Exporting {name} to pdf: {pdf} and html: {html}")
+    resources = {"outputs": {}}
+
+    image_dir = "notebooks/temp/"
+
+    for image_name in os.listdir(image_dir):
+        image_path = os.path.join(image_dir, image_name)
+        with open(image_path, "rb") as f:
+            resources["outputs"][image_name] = f.read()
+    print(resources.keys())
+
     if pdf:
         export_pdf(notebook, resources, name)
     if html:

@@ -3,20 +3,23 @@
 {%- block extra_css -%}
   {{ super() }}
   <style>
-    .question {
-      page-break-inside: avoid;
-    }
     .header {
       background-color: #f1f1f1;
       padding: 20px;
       text-align: center;
       border: 1px solid #d3d3d3;
     }
+    .jp-InputPrompt {
+      display: none !important;
+    }
+    p {
+      margin: 0 !important;
+    }
   </style>
 {%- endblock extra_css -%}
 
 {% block body_header %}
-  <div class="header" style="width: 100%; padding: 10px; border-bottom: 2px solid #000; margin-bottom: 20px;">
+  <div class="header" style="width: 100%; padding: 10px; border-bottom: 2px solid #000; margin-bottom: 10px;">
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <div style="flex-grow: 1; text-align: left;">
         <h1 style="margin: 0;">Exam 1 - Units, Vectors, and Kinematics</h1>
@@ -29,6 +32,8 @@
     <div style="margin-top: 10px; display: flex; justify-content: space-between;">
       <div style="width: 70%; text-align: left;">
         <strong>Class Number:</strong> <u>&nbsp&nbsp&nbsp PHYS 1061 H002 &nbsp&nbsp&nbsp</u>
+        <strong>Instructor:</strong>   <u>&nbsp&nbsp&nbsp&nbsp Michael Haas &nbsp&nbsp&nbsp&nbsp</u>
+          
       </div>
       <div style="width: 30%; text-align: right;">
         <strong>Name:</strong> <u>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</u>
@@ -37,7 +42,7 @@
 
     <div style="margin-top: 15px;">
       <p style="margin: 0; font-size: 14px; text-align: justify;">
-        Please follow the instructions carefully. Answer all the questions in the space provided. Use the back of the sheet if necessary.
+        Please read and follow all instructions carefully. Use the back of the sheet if necessary. The <i>answer</i> is 42.
       </p>
     </div>
   </div>
