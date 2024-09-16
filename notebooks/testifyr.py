@@ -7,95 +7,12 @@ from typing import List, Dict, Any, Optional
 
 from IPython.display import Markdown, display
 
-
-style_string = """<style>
-.spaceBox {
-    border: 2px solid black;
-    width: 100%;
-    box-sizing: border-box;
-    line-height: 1em;
-    height: calc(1em * 10);
-    page-break-inside: avoid;
-}
-//.question {
-//    page-break-inside: avoid;
-//}
-.problem {
-    font-size: 1em;
-    page-break-inside: avoid;
-    padding-left: 0.5em;
-    padding-right: 0.5em;
-    padding-top: 0.1em;
-    padding-bottom: 0.1em;
-}
-.problem_info {
-    font-size: 1.2em;
-    font-weight: bold;
-}
-.question {
-    font-size: 1em;
-    page-break-inside: avoid;
-}
-.question_info {
-    font-size: 0.8em;
-    font-weight: bold;
-}
-.extra_info {
-    font-size: 0.8em;
-    font-weight: bold;
-    width: 50%;
-    text-align: center;
-    border: 2px solid black;
-    margin: 1em;
-    padding: 1em;
-}
-.extra_item {
-    font-size: 1.1em;
-}
-.bonus {
-    page-break-inside: avoid;
-    border: 2px solid black;
-    font-size: 1em;
-    margin-top: 1em;
-    margin-bottom: 1em;
-    margin-left: 1.5em;
-    margin-right: 1.5em;
-    padding: 0.2em
-}
-.bonus_info {
-    font-size: 1.2em;
-    font-weight: bold;
-}
-.problem ol {
-    list-style-type: upper-alpha;
-}
-.problem img {
-    max-width: 100%;
-    height: 15em;
-}
-.spacer_span {
-    width: 5em;
-    display: inline-block;
-    border-bottom: 1px solid black;
-}
-.test_info {
-    font-size: 0.8em;
-    border: 1px solid black;
-    text-align: center;
-}
-</style>"""
+with open("testifyr.css", "r") as f:
+    style_string = "<style>" + f.read() + "</style>"
 
 
-def styled_print(string: str):
+def _styled_print(string: str):
     display(Markdown(style_string + string))
-
-
-def ordered_list(items):
-    out = "\n<ol type='a'>\n"
-    for item in items:
-        out += f"<li>\n\n {item} \n\n</li> \n"
-    out += f"</ol>\n"
-    return out
 
 
 @dataclass
@@ -103,6 +20,7 @@ class Question:
     statement: str = ""
     space: Optional[int] = None
     points: int = 3
+    answer: str = ""
 
     def statement_html(self):
         return f"<p>\n\n {self.statement} \n\n</p>"
@@ -110,15 +28,18 @@ class Question:
     def space_string(self):
         return ("*" * 10 + "\n") * self.space if self.space else ""
 
-    def space_html(self):
+    def space_html(self, answers=False):
         return f"""<div
                         class="spaceBox"
-                        style="height: calc(1em * {self.space or 0}); display: {"default" if self.space else "none"};"
-                    ></div>"""
+                        style="height: calc(1em * {self.space or 0}); display: {"default" if self.space else "none"}; background-color: {'lightgreen' if answers else 'white'}"
+                    >
 
-    def html(self, number=None):
+{self.answer if answers else ""}
+</div>"""
+
+    def html(self, number=None, answers=False):
         if number:
-            return f"<div class='question'><p><div class='question_info'> \n\n Question #{number} ({self.points} points) </div> \n\n {self.statement_html()} \n\n {self.space_html()} \n\n</p></div>"
+            return f"<div class='question'><p><div class='question_info'> \n\n Question #{number} ({self.points} points) </div> \n\n {self.statement_html()} \n\n {self.space_html(answers=answers)} \n\n</p></div>"
         return f'<div class="question">\n\n {self.statement_html()} \n\n {self.space_html()} \n\n</div>'
 
 
@@ -144,29 +65,34 @@ class Problem:
         elif isinstance(self, WorkProblem):
             return sum([q.points for q in self.questions])
 
-    def content_html(self):
+    def content_html(self, answers=False):
         if self.figure:
             return f"<div>\n\n {self.statement} \n\n <img src='data:image/png;base64, {self.figure.decode('utf-8')}'/> \n\n</div>"
         return f"<div>\n\n {self.statement} \n\n</div>"
 
-    def html(self, number=None):
+    def html(self, number=None, answers=False):
         if number:
-            return f"<div class='problem'><p><div class='problem_info'> \n\n Problem #{number} ({self.points} points) </div> \n\n {self.content_html()} \n\n</p></div>"
-        return f"<div class='problem'><p>\n\n {self.content_html()} \n\n</p></div>"
+            return f"<div class='problem'><p><div class='problem_info'> \n\n Problem #{number} ({self.points} points) </div> \n\n {self.content_html(answers=answers)} \n\n</p></div>"
+        return f"<div class='problem'><p>\n\n {self.content_html(answers=answers)} \n\n</p></div>"
 
-    def show(self):
-        styled_print(self.html())
+    def show(self, answers=False):
+        _styled_print(self.html(answers=answers))
 
 
 @dataclass
 class MultipleChoiceProblem(Problem):
     choices: List[Choice] = field(default_factory=list)
 
-    def content_html(self):
+    def content_html(self, answers=False):
+        def choice_class(correct):
+            if answers:
+                return "choice_correct" if correct else "choice_incorrect"
+            return "choice"
+
         out = super().content_html()
         out += "<ol>\n"
         for choice in self.choices:
-            out += f"<li>\n\n {choice.html()} \n\n</li>"
+            out += f"<li class='{choice_class(choice.correct)}'>\n\n {choice.html()} \n\n</li>"
         out += "</ol>\n"
         return out
 
@@ -175,7 +101,7 @@ class MultipleChoiceProblem(Problem):
 class WorkProblem(Problem):
     questions: List[Question] = field(default_factory=list)
 
-    def content_html(self):
+    def content_html(self, answers=False):
         out = super().content_html()
         if self.extras:
             out += "<div class='extra_info'> Extra information \n\n"
@@ -183,7 +109,7 @@ class WorkProblem(Problem):
                 out += f"<div class='extra_item'>\n\n {extra} \n\n</div>\n"
             out += "</div> \n\n"
         for i, question in enumerate(self.questions, start=1):
-            out += question.html(number=i)
+            out += question.html(number=i, answers=answers)
         return out
 
 
@@ -191,12 +117,18 @@ class WorkProblem(Problem):
 class Bonus:
     statement: str = ""
     points: int = 3
+    answer: str = ""
 
-    def html(self, number=0):
-        return f"<div class='bonus'><p><div class='bonus_info'> \n\n Bonus #{number} ({self.points} points) </div> \n\n {self.statement} \n\n</p></div>"
+    def answer_html(self, answers=False):
+        if answers:
+            return f"<span class='choice_correct'>\n{self.answer}\n</span>"
+        return
 
-    def show(self):
-        styled_print(self.html())
+    def html(self, number=0, answers=False):
+        return f"<div class='bonus'><p><div class='bonus_info'> \n\n Bonus #{number} ({self.points} points) </div> \n\n {self.statement} {self.answer_html(answers)} \n\n</p></div>"
+
+    def show(self, answers=False):
+        _styled_print(self.html(answers=answers))
 
 
 @dataclass
@@ -204,8 +136,8 @@ class Test:
     metadata: Dict[str, Any] = field(default_factory=dict)
     problems: List[Problem] = field(default_factory=list)
 
-    def show(self):
-        styled_print(self.html())
+    def show(self, answers=False):
+        _styled_print(self.html(answers=answers))
 
     def total_points(self):
         points = 0
@@ -223,10 +155,10 @@ class Test:
             ),
         }
 
-    def html(self):
+    def html(self, answers=False):
         points = self.total_points()
         out = f"<div class='test_info'> \n\n Score: <span class='spacer_span'></span> / {points['total']} + Bonus: <span class='spacer_span'></span> / {points['bonus']} = Total: <span class='spacer_span'></span> / {points['total']} || Final: <span class='spacer_span'></span>% -> [A, B, C, D, F]</div> \n\n"
 
         for i, problem in enumerate(self.problems, start=1):
-            out += problem.html(number=i)
+            out += problem.html(number=i, answers=answers)
         return out

@@ -1,0 +1,92 @@
+.spaceBox {
+    border: 2px solid black;
+    width: 100%;
+    box-sizing: border-box;
+    line-height: 1em;
+    height: calc(1em * 10);
+    page-break-inside: avoid;
+}
+
+.problem {
+    font-size: 1em;
+    page-break-inside: avoid;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    padding-top: 0.1em;
+    padding-bottom: 0.1em;
+}
+
+.problem_info {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.question {
+    font-size: 1em;
+    page-break-inside: avoid;
+}
+
+.question_info {
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.extra_info {
+    font-size: 0.8em;
+    font-weight: bold;
+    width: 50%;
+    text-align: center;
+    border: 2px solid black;
+    margin: 1em;
+    padding: 1em;
+}
+
+.extra_item {
+    font-size: 1.1em;
+}
+
+.bonus {
+    page-break-inside: avoid;
+    border: 2px solid black;
+    font-size: 1em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    margin-left: 1.5em;
+    margin-right: 1.5em;
+    padding: 0.2em
+}
+
+.bonus_info {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.problem ol {
+    list-style-type: upper-alpha;
+}
+
+.problem img {
+    max-width: 100%;
+    height: 15em;
+}
+
+.spacer_span {
+    width: 5em;
+    display: inline-block;
+    border-bottom: 1px solid black;
+}
+
+.test_info {
+    font-size: 0.8em;
+    border: 1px solid black;
+    text-align: center;
+}
+
+.choice_correct {
+    background-color: lightgreen;
+    font-weight: bold;
+}
+
+.choice_incorrect {
+    color: red;
+}
