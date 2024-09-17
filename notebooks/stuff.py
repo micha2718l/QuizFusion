@@ -23,8 +23,14 @@ class Value(pint.Quantity):
         return obj
 
     def __format__(self, format_spec):
+        clean = False
+
         if format_spec:
-            self.sigfigs = int(format_spec)
+            if format_spec[0] == "C":
+                clean = True
+                format_spec = format_spec[1:]
+            if len(format_spec) > 1:
+                self.sigfigs = int(format_spec)
         unit = self.units
         if isinstance(unit, pint.Unit):
             match self.units:
@@ -32,7 +38,8 @@ class Value(pint.Quantity):
                     unit = r"^\circ"
                 case _:
                     unit = f"{unit:~L}"
-        return f"${'0'*self.pre_zeros}{self.magnitude:#.{self.sigfigs}g} {unit}$"
+        out = f"{'0'*self.pre_zeros}{self.magnitude:#.{self.sigfigs}g} {unit}"
+        return out if clean else f"${out}$"
 
     def __repr__(self):
         return self.__format__(None)
