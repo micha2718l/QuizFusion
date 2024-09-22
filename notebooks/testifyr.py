@@ -162,3 +162,16 @@ class Test:
         for i, problem in enumerate(self.problems, start=1):
             out += problem.html(number=i, answers=answers)
         return out
+
+    def get_grade_list(self):
+        grades = []
+        for i, problem in enumerate(self.problems, start=1):
+            n = str(i).zfill(2)
+            if isinstance(problem, MultipleChoiceProblem):
+                grades.append(f"P-{n}-MC(3)")
+            elif isinstance(problem, WorkProblem):
+                for j, q in enumerate(problem.questions):
+                    grades.append(f"P-{n}-W{j}({q.points})")
+            elif isinstance(problem, Bonus):
+                grades.append(f"P-{n}-BN({problem.points})")
+        return grades
