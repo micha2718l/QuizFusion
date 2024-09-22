@@ -5,7 +5,6 @@ from convert_utils import open_notebook, export, detect_file_changes
 
 name = "kinematics_problems"
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--watch", action="store_true")

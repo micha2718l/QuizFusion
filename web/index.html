@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problem Editor</title>
+    <style>
+        /* ... (previous CSS remains the same) ... */
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="metadata">
+                <input type="text" id="problemTitle" placeholder="Title">
+                <input type="text" id="problemAuthor" placeholder="Author">
+                <input type="text" id="problemDate" placeholder="Date">
+            </div>
+        </header>
+
+        <main class="main-content">
+            <section class="editor">
+                <div class="problem-statement">
+                    <h2>Problem Statement</h2>
+                    <textarea id="problemStatement" placeholder="Enter the problem statement here"></textarea>
+                </div>
+                <div id="questionsContainer" class="questions">
+                    <h2>Questions</h2>
+                    <!-- Questions will be dynamically added here -->
+                </div>
+                <button id="addQuestionBtn">Add Question</button>
+            </section>
+            <section id="previewSection" class="preview">
+                <h2>Preview</h2>
+                <!-- Rendered output will be displayed here -->
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="button-row">
+                <button id="saveBtn">Save</button>
+                <button id="loadBtn">Load</button>
+                <button id="clearBtn">Clear</button>
+                <button id="exportBtn">Export</button>
+            </div>
+            <button id="generateTestBtn" class="main-action">Generate Test</button>
+        </footer>
+    </div>
+    <script src="/eel.js"></script>
+    <script>
+
+        // Global state to store the current problem data
+        let problemData = {
+            title: '',
+            author: '',
+            date: '',
+            statement: '',
+            questions: [{ statement: '', answer: '' }]  // Initialize with one empty question
+        };
+
+        // Function to initialize the application
+        function init() {
+            // Add event listeners
+            document.getElementById('problemTitle').addEventListener('input', updateProblemData);
+            document.getElementById('problemAuthor').addEventListener('input', updateProblemData);
+            document.getElementById('problemDate').addEventListener('input', updateProblemData);
+            document.getElementById('problemStatement').addEventListener('input', updateProblemData);
+            document.getElementById('addQuestionBtn').addEventListener('click', addQuestion);
+            document.getElementById('saveBtn').addEventListener('click', saveProblem);
+            document.getElementById('loadBtn').addEventListener('click', loadProblem);
+            document.getElementById('clearBtn').addEventListener('click', clearProblem);
+            document.getElementById('exportBtn').addEventListener('click', exportProblem);
+            document.getElementById('generateTestBtn').addEventListener('click', generateTest);
+
+            // Load any saved problem data or initialize with one question
+            loadProblem();
+        }
+
+        // Function to update the problem data and trigger a preview update
+        function updateProblemData() {
+            try {
+                problemData.title = document.getElementById('problemTitle').value;
+                problemData.author = document.getElementById('problemAuthor').value;
+                problemData.date = document.getElementById('problemDate').value;
+                problemData.statement = document.getElementById('problemStatement').value;
+
+                // Update questions data
+                const questionElements = document.querySelectorAll('.question');
+                problemData.questions = Array.from(questionElements).map(questionElem => ({
+                    statement: questionElem.querySelector('.questionStatement')?.value || '',
+                    answer: questionElem.querySelector('.questionAnswer')?.value || ''
+                }));
+
+                // Ensure there's always at least one question
+                if (problemData.questions.length === 0) {
+                    problemData.questions.push({ statement: '', answer: '' });
+                    renderQuestions();  // Re-render questions to show the added empty question
+                }
+
+                updatePreview();
+            } catch (error) {
+                console.error('Error updating problem data:', error);
+            }
+        }
+
+        // Function to add a new question
+        function addQuestion() {
+            try {
+                const questionsContainer = document.getElementById('questionsContainer');
+                const questionNumber = questionsContainer.children.length + 1;
+
+                const questionElement = document.createElement('div');
+                questionElement.className = 'question';
+                questionElement.innerHTML = `
+                    <div class="question-controls">
+                        <span>Question ${questionNumber}</span>
+                        <button class="deleteQuestionBtn">Delete</button>
+                    </div>
+                    <textarea class="questionStatement" placeholder="Enter the question statement here"></textarea>
+                    <textarea class="questionAnswer" placeholder="Enter the answer here"></textarea>
+                `;
+
+                questionsContainer.appendChild(questionElement);
+
+                // Add event listeners for the new question
+                questionElement.querySelector('.questionStatement').addEventListener('input', updateProblemData);
+                questionElement.querySelector('.questionAnswer').addEventListener('input', updateProblemData);
+                questionElement.querySelector('.deleteQuestionBtn').addEventListener('click', () => deleteQuestion(questionElement));
+
+                updateProblemData();
+            } catch (error) {
+                console.error('Error adding question:', error);
+            }
+        }
+
+        // Function to delete a question
+        function deleteQuestion(questionElement) {
+            try {
+                const questionsContainer = document.getElementById('questionsContainer');
+                if (questionsContainer.children.length > 1) {
+                    questionElement.remove();
+                    updateProblemData();
+                    renumberQuestions();
+                } else {
+                    alert('You must have at least one question.');
+                }
+            } catch (error) {
+                console.error('Error deleting question:', error);
+            }
+        }
+
+        // Function to renumber questions after deletion
+        function renumberQuestions() {
+            const questions = document.querySelectorAll('.question');
+            questions.forEach((question, index) => {
+                question.querySelector('span').textContent = `Question ${index + 1}`;
+            });
+        }
+
+        // Function to render all questions
+        function renderQuestions() {
+            const questionsContainer = document.getElementById('questionsContainer');
+            questionsContainer.innerHTML = '';  // Clear existing questions
+
+            problemData.questions.forEach((question, index) => {
+                const questionElement = document.createElement('div');
+                questionElement.className = 'question';
+                questionElement.innerHTML = `
+                    <div class="question-controls">
+                        <span>Question ${index + 1}</span>
+                        <button class="deleteQuestionBtn">Delete</button>
+                    </div>
+                    <textarea class="questionStatement" placeholder="Enter the question statement here">${question.statement}</textarea>
+                    <textarea class="questionAnswer" placeholder="Enter the answer here">${question.answer}</textarea>
+                `;
+
+                questionsContainer.appendChild(questionElement);
+
+                // Add event listeners for the question
+                questionElement.querySelector('.questionStatement').addEventListener('input', updateProblemData);
+                questionElement.querySelector('.questionAnswer').addEventListener('input', updateProblemData);
+                questionElement.querySelector('.deleteQuestionBtn').addEventListener('click', () => deleteQuestion(questionElement));
+            });
+        }
+
+        // Function to update the preview
+        async function updatePreview() {
+            try {
+                // Call the Python function through eel
+                const renderedHtml = await eel.render_preview(problemData)();
+                document.getElementById('previewSection').innerHTML = renderedHtml;
+            } catch (error) {
+                console.error('Error updating preview:', error);
+                document.getElementById('previewSection').innerHTML = '<p>Error updating preview. Please try again.</p>';
+            }
+        }
+
+        // Function to save the problem data locally
+        function saveProblem() {
+            try {
+                localStorage.setItem('problemData', JSON.stringify(problemData));
+                alert('Problem saved successfully!');
+            } catch (error) {
+                console.error('Error saving problem:', error);
+                alert('Failed to save problem. Please try again.');
+            }
+        }
+
+        // Function to load the problem data from local storage
+        function loadProblem() {
+            try {
+                const savedData = localStorage.getItem('problemData');
+                if (savedData) {
+                    problemData = JSON.parse(savedData);
+                }
+
+                // Ensure there's at least one question
+                if (!problemData.questions || problemData.questions.length === 0) {
+                    problemData.questions = [{ statement: '', answer: '' }];
+                }
+
+                // Update UI with loaded data
+                document.getElementById('problemTitle').value = problemData.title || '';
+                document.getElementById('problemAuthor').value = problemData.author || '';
+                document.getElementById('problemDate').value = problemData.date || '';
+                document.getElementById('problemStatement').value = problemData.statement || '';
+
+                renderQuestions();
+                updatePreview();
+            } catch (error) {
+                console.error('Error loading problem:', error);
+                alert('Failed to load problem. Initializing with default data.');
+                clearProblem();
+            }
+        }
+
+        // Function to clear the problem data
+        function clearProblem() {
+            problemData = {
+                title: '',
+                author: '',
+                date: '',
+                statement: '',
+                questions: [{ statement: '', answer: '' }]  // Initialize with one empty question
+            };
+            document.getElementById('problemTitle').value = '';
+            document.getElementById('problemAuthor').value = '';
+            document.getElementById('problemDate').value = '';
+            document.getElementById('problemStatement').value = '';
+            renderQuestions();
+            updatePreview();
+        }
+
+        // ... (exportProblem and generateTest functions remain the same) ...
+
+        // Initialize the application when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>
