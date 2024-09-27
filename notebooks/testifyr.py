@@ -7,12 +7,20 @@ from typing import List, Dict, Any, Optional
 
 from IPython.display import Markdown, display
 
-with open("testifyr.css", "r") as f:
+from pathlib import Path
+
+current_dir = Path(__file__).parent
+
+with open(current_dir / Path("testifyr.css"), "r") as f:
     style_string = "<style>" + f.read() + "</style>"
 
 
+def _styled_string(string: str):
+    return style_string + string
+
+
 def _styled_print(string: str):
-    display(Markdown(style_string + string))
+    display(Markdown(_styled_string(string)))
 
 
 @dataclass
@@ -74,6 +82,9 @@ class Problem:
         if number:
             return f"<div class='problem'><p><div class='problem_info'> \n\n Problem #{number} ({self.points} points) </div> \n\n {self.content_html(answers=answers)} \n\n</p></div>"
         return f"<div class='problem'><p>\n\n {self.content_html(answers=answers)} \n\n</p></div>"
+
+    def styled_html(self, answers=False):
+        return _styled_string(self.html(answers=answers))
 
     def show(self, answers=False):
         _styled_print(self.html(answers=answers))

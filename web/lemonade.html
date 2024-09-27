@@ -1,0 +1,30 @@
+<html>
+  <script src="https://cdn.jsdelivr.net/npm/lemonadejs@4/dist/lemonade.min.js"></script>
+  <div id="root"></div>
+
+  <div>{{40+2}}</div>
+  <script>
+    // Component Hello
+    function Hello() {
+      let self = this;
+      return `<div>You clicked {{self.number}} times {{40+3+self.count}} </div>`;
+    }
+    // Create the component
+    function App() {
+      let self = this;
+      self.count = 1;
+      self.click = () => {
+        self.count++;
+      };
+      return `<>
+        <Hello :number="self.count" />
+        <div>{{40+4}}</div>
+        <input type="button" onclick="self.click" value="Click me" />
+    </>`;
+    }
+    // Register the dependencies to be used across the application
+    lemonade.setComponents({ Hello });
+    // Render the component
+    lemonade.render(App, document.getElementById("root"));
+  </script>
+</html>

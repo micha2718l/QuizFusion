@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Input/Output Form</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML-full,Safe"></script>
+    <script type="text/javascript" src="mathJaxInit.js"></script>
+    <script type="text/javascript" src="/eel.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.47/vue.global.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 p-4">
+    <div id="app" class="container mx-auto">
+      <div class="flex flex-col md:flex-row gap-4">
+        <!-- Input Section -->
+        <div class="w-full md:w-1/2 bg-white p-4 rounded shadow">
+          <h2 class="text-2xl font-bold mb-4">Inputs</h2>
+
+          <!-- Values Section -->
+          <div class="mb-4">
+            <h3 class="text-xl font-semibold mb-2">Values</h3>
+            <div
+              v-for="(value, index) in values"
+              :key="index"
+              class="mb-2 p-2 bg-gray-100 rounded"
+            >
+              <input
+                v-model="value.name"
+                placeholder="Variable Name"
+                class="w-full mb-1 p-1 border rounded"
+              />
+              <input
+                v-model="value.value"
+                type="number"
+                placeholder="Numeric Value"
+                class="w-full mb-1 p-1 border rounded"
+              />
+              <input
+                v-model="value.unit"
+                placeholder="Unit"
+                class="w-full mb-1 p-1 border rounded"
+              />
+              <input
+                v-model="value.sigfigs"
+                type="number"
+                placeholder="Significant Figures"
+                class="w-full mb-1 p-1 border rounded"
+              />
+              <input
+                v-model="value.preZeros"
+                type="number"
+                placeholder="Pre-zeros"
+                class="w-full mb-1 p-1 border rounded"
+              />
+              <button
+                @click="removeValue(index)"
+                class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition"
+              >
+                Remove
+              </button>
+            </div>
+            <button
+              @click="addValue"
+              class="bg-blue-500 text-white px-2 py-1 rounded mt-2 hover:bg-blue-600 transition"
+            >
+              Add Value
+            </button>
+          </div>
+
+          <!-- Statement Section -->
+          <div class="mb-4">
+            <h3 class="text-xl font-semibold mb-2">Problem Statement</h3>
+            <textarea
+              v-model="statement"
+              rows="4"
+              class="w-full p-2 border rounded resize-y"
+            ></textarea>
+          </div>
+
+          <!-- Questions Section -->
+          <div>
+            <h3 class="text-xl font-semibold mb-2">Questions</h3>
+            <div
+              v-for="(question, index) in questions"
+              :key="index"
+              class="mb-2"
+            >
+              <input
+                v-model="question.text"
+                placeholder="Question"
+                class="w-full p-2 border rounded"
+              />
+              <button
+                @click="removeQuestion(index)"
+                class="bg-red-500 text-white px-2 py-1 rounded mt-1 hover:bg-red-600 transition"
+              >
+                Remove
+              </button>
+            </div>
+            <button
+              @click="addQuestion"
+              class="bg-blue-500 text-white px-2 py-1 rounded mt-2 hover:bg-blue-600 transition"
+            >
+              Add Question
+            </button>
+          </div>
+        </div>
+
+        <!-- Output Section -->
+        <div class="w-full md:w-1/2 bg-white p-4 rounded shadow">
+          <h2 class="text-2xl font-bold mb-4">Output</h2>
+          <div class="mb-4">
+            <button
+              @click="activeTab = 'raw'"
+              :class="{'bg-blue-500 text-white': activeTab === 'raw', 'bg-gray-200': activeTab !== 'raw'}"
+              class="px-4 py-2 rounded-tl rounded-tr transition"
+            >
+              Raw
+            </button>
+            <button
+              @click="activeTab = 'rendered'"
+              :class="{'bg-blue-500 text-white': activeTab === 'rendered', 'bg-gray-200': activeTab !== 'rendered'}"
+              class="px-4 py-2 rounded-tl rounded-tr transition"
+            >
+              Rendered
+            </button>
+            <button
+              @click="getHtml"
+              class="bg-blue-500 text-white px-4 py-2 rounded-tr rounded-tl transition"
+            >
+              Generate HTML
+            </button>
+          </div>
+          <div v-if="activeTab === 'raw'" class="bg-gray-100 p-4 rounded">
+            <pre class="whitespace-pre-wrap break-words">
+                {{ returnedHtml }}
+            </pre>
+          </div>
+          <div
+            v-else-if="activeTab === 'rendered'"
+            class="bg-gray-100 p-4 rounded"
+          >
+            <div id="outputRendered" v-html="returnedHtml"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const app = Vue.createApp({
+        data() {
+          return {
+            values: [],
+            statement: "",
+            questions: [{ text: "" }],
+            activeTab: "raw",
+            returnedHtml: "",
+          };
+        },
+        updated() {
+          this.getHtml();
+          MathJax.Hub.Typeset()();
+        },
+        computed: {
+          formData() {
+            return {
+              values: this.values,
+              statement: this.statement,
+              questions: this.questions.map((q) => q.text),
+            };
+          },
+        },
+        methods: {
+          addValue() {
+            this.values.push({
+              name: "",
+              value: "",
+              unit: "",
+              sigfigs: "",
+              preZeros: "",
+            });
+          },
+          removeValue(index) {
+            this.values.splice(index, 1);
+          },
+          addQuestion() {
+            this.questions.push({ text: "" });
+          },
+          removeQuestion(index) {
+            this.questions.splice(index, 1);
+          },
+          formatValue(value) {
+            let num = parseFloat(value.value);
+            if (isNaN(num)) return value.value;
+            let formatted = num.toFixed(parseInt(value.sigfigs) || 0);
+            let [integer, decimal] = formatted.split(".");
+            integer = integer.padStart(parseInt(value.preZeros) || 0, "0");
+            return decimal ? `${integer}.${decimal}` : integer;
+          },
+          getHtml() {
+            eel
+              .getHtml(this.formData)()
+              .then((html) => {
+                this.returnedHtml = html;
+              });
+          },
+        },
+      }).mount("#app");
+    </script>
+  </body>
+</html>
