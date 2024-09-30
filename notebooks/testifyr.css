@@ -70,16 +70,42 @@
     height: 15em;
 }
 
+.problem .svg_container {
+    display: flex;
+    justify-content: center;
+    max-width: 100%;
+    height: 13em;
+}
+
+.fig_space_container {
+    display: flex;
+    justify-content: center;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.fig_space_container .img_container {
+    min-width: 33%;
+    display: flex;
+    justify-content: center;
+}
+
 .spacer_span {
     width: 5em;
     display: inline-block;
     border-bottom: 1px solid black;
 }
 
-.test_info {
+.test_info_box {
     font-size: 0.8em;
     border: 1px solid black;
     text-align: center;
+    height: 4em;
+    display: flex;
+}
+
+.test_info {
+    align-self: flex-end;
 }
 
 .choice_correct {
@@ -89,4 +115,9 @@
 
 .choice_incorrect {
     color: red;
+}
+
+.svg_container {
+    display: flex;
+    justify-content: center;
 }

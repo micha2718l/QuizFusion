@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 426.523 429.678" xmlns="http://www.w3.org/2000/svg">
+  <rect x="214.271" y="100" width="100" height="100" rx="5" ry="5" style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0);" transform="matrix(1, 0, 0, 1, 7.105427357601002e-15, 0)"/>
+  <rect y="300" width="100" height="100" rx="5" ry="5" style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0);" x="13.271" transform="matrix(1, 0, 0, 1, 7.105427357601002e-15, 0)"/>
+  <rect x="113.271" y="200" width="300" height="46.437" rx="5" ry="5" style="stroke: rgb(0, 0, 0); fill: none; stroke-width: 8px;" transform="matrix(1, 0, 0, 1, 7.105427357601002e-15, 0)"/>
+  <path style="stroke: rgb(0, 0, 0); fill: none; stroke-width: 4px;" d="M 213.271 113.17 L 184.80533333333335 112.952 C 156.33966666666666 112.734 99.40833333333332 112.298 71.5185 143.43633333333332 C 43.62866666666667 174.57466666666664 44.78033333333334 237.28733333333332 45.35616666666667 268.64366666666666 L 45.932 300" transform="matrix(1, 0, 0, 1, 7.105427357601002e-15, 0)"/>
+  <ellipse style="stroke: rgb(0, 0, 0); fill: none; stroke-width: 16px;" cx="85.663" cy="167.088" rx="14.608" ry="15.298" transform="matrix(1, 0, 0, 1, 7.105427357601002e-15, 0)"/>
+
+  <rect x="141.486" y="246.437" width="42.975" height="153.563" rx="5" ry="5" style="stroke: rgb(0, 0, 0); fill: none; stroke-width: 8px;" transform="matrix(1, 0, 0, 1, 7.105427357601002e-15, 0)"/>
+  <rect x="341.329" y="246.437" width="42.975" height="153.563" rx="5" ry="5" style="stroke: rgb(0, 0, 0); fill: none; stroke-width: 8px;" transform="matrix(1, 0, 0, 1, 7.105427357601002e-15, 0)"/>
+  <line style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0); stroke-width: 4px;" x1="85.806" y1="167.22" x2="113.271" y2="200" transform="matrix(1, 0, 0, 1, 7.105427357601002e-15, 0)"/>
+  
+  <foreignObject x="245" y="138" width="100" height="100" style="font-size:20">
+
+$m_1$
+
+  </foreignObject>
+
+  <foreignObject x="45" y="335" width="100" height="100" style="font-size:20">
+
+$m_2$
+
+  </foreignObject>
+
+  <foreignObject x="245" y="210" width="100" height="100" style="font-size:20">
+
+$\mu_k$
+
+  </foreignObject>
+
+</svg>

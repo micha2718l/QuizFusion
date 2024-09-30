@@ -21,6 +21,7 @@ class Question:
     space: Optional[int] = None
     points: int = 3
     answer: str = ""
+    figure: Optional[str] = None
 
     def statement_html(self):
         return f"<p>\n\n {self.statement} \n\n</p>"
@@ -29,13 +30,18 @@ class Question:
         return ("*" * 10 + "\n") * self.space if self.space else ""
 
     def space_html(self, answers=False):
-        return f"""<div
+        out = f"""<div class="fig_space_container">
+        <div
                         class="spaceBox"
                         style="height: calc(1em * {self.space or 0}); display: {"default" if self.space else "none"}; background-color: {'lightgreen' if answers else 'white'}"
                     >
 
 {self.answer if answers else ""}
+
 </div>"""
+        if self.figure:
+            out += f"""<div class="img_container"><img src='data:image/png;base64, {self.figure.decode('utf-8')}' style="height: calc(1em * {self.space or 0})"/></div>"""
+        return out + "</div>"
 
     def html(self, number=None, answers=False):
         if number:
@@ -56,6 +62,7 @@ class Choice:
 class Problem:
     statement: str = ""
     figure: str = ""
+    figure_svg: str = ""
     extras: List[str] = field(default_factory=list)
 
     @property
@@ -66,9 +73,13 @@ class Problem:
             return sum([q.points for q in self.questions])
 
     def content_html(self, answers=False):
+        out = f"<div>\n\n {self.statement} \n\n "
         if self.figure:
-            return f"<div>\n\n {self.statement} \n\n <img src='data:image/png;base64, {self.figure.decode('utf-8')}'/> \n\n</div>"
-        return f"<div>\n\n {self.statement} \n\n</div>"
+            out += f"<img src='data:image/png;base64, {self.figure.decode('utf-8')}'/>"
+        if self.figure_svg:
+            out += f"<div class='svg_container'>\n\n {self.figure_svg} \n\n</div>"
+        out += "\n\n</div>"
+        return out
 
     def html(self, number=None, answers=False):
         if number:
@@ -122,7 +133,7 @@ class Bonus:
     def answer_html(self, answers=False):
         if answers:
             return f"<span class='choice_correct'>\n{self.answer}\n</span>"
-        return
+        return ""
 
     def html(self, number=0, answers=False):
         return f"<div class='bonus'><p><div class='bonus_info'> \n\n Bonus #{number} ({self.points} points) </div> \n\n {self.statement} {self.answer_html(answers)} \n\n</p></div>"
@@ -157,7 +168,7 @@ class Test:
 
     def html(self, answers=False):
         points = self.total_points()
-        out = f"<div class='test_info'> \n\n Score: <span class='spacer_span'></span> / {points['total']} + Bonus: <span class='spacer_span'></span> / {points['bonus']} = Total: <span class='spacer_span'></span> / {points['total']} || Final: <span class='spacer_span'></span>% -> [A, B, C, D, F]</div> \n\n"
+        out = f"<div class='test_info_box'> <div class='test_info'> \n\n Score: <span class='spacer_span'></span> / {points['total']} + Bonus: <span class='spacer_span'></span> / {points['bonus']} = Total: <span class='spacer_span'></span> / {points['total']} || Final: <span class='spacer_span'></span>% -> [A, B, C, D, F]</div></div> \n\n"
 
         for i, problem in enumerate(self.problems, start=1):
             out += problem.html(number=i, answers=answers)

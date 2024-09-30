@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 414.142 234.909" xmlns="http://www.w3.org/2000/svg">
+  <rect x="107.071" y="107.071" width="200" height="100" style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0);"/>
+  <path d="M 100 199.5 H 221.421 L 221.421 190 L 241.421 200 L 221.421 210 L 221.421 200.5 H 100 V 199.5 Z" style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0);" transform="matrix(0.7071070075035095, 0.7071070075035095, -0.7071070075035095, 0.7071070075035095, 77.78176879882812, -205.06103515625)"/>
+  <path d="M 400 299.5 H 521.421 L 521.421 290 L 541.421 300 L 521.421 310 L 521.421 300.5 H 400 V 299.5 Z" style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0);" transform="matrix(0.7071070075035095, -0.7071070075035095, 0.7071070075035095, 0.7071070075035095, -187.90367126464844, 177.7816619873047)"/>
+
+  <foreignObject x="350" y="0" width="100" height="100" style="font-size:20">
+
+$\vec{F_2}$
+
+  </foreignObject>
+  <foreignObject x="50" y="0" width="100" height="100" style="font-size:20" transform="translate(-20 0)">
+
+$\vec{F_1}$
+
+  </foreignObject>
+
+
+  <rect x="7.071" y="207.071" width="400" height="20" style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0);"/>
+</svg>
