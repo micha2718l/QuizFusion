@@ -136,7 +136,19 @@ class Bonus:
         return ""
 
     def html(self, number=0, answers=False):
-        return f"<div class='bonus'><p><div class='bonus_info'> \n\n Bonus #{number} ({self.points} points) </div> \n\n {self.statement} {self.answer_html(answers)} \n\n</p></div>"
+        return f"<div class='bonus'><p><div class='bonus_info'> \n\n Bonus #{number} ({self.points} points) {self.answer_html(answers)}</div> \n\n {self.statement} \n\n</p></div>"
+
+    def show(self, answers=False):
+        _styled_print(self.html(answers=answers))
+
+
+@dataclass
+class Information:
+    statement: str = ""
+    points = None
+
+    def html(self, number=0, answers=False):
+        return f"<div class='information'><p>\n\n {self.statement} \n\n</p></div>"
 
     def show(self, answers=False):
         _styled_print(self.html(answers=answers))
@@ -170,8 +182,11 @@ class Test:
         points = self.total_points()
         out = f"<div class='test_info_box'> <div class='test_info'> \n\n Score: <span class='spacer_span'></span> / {points['total']} + Bonus: <span class='spacer_span'></span> / {points['bonus']} = Total: <span class='spacer_span'></span> / {points['total']} || Final: <span class='spacer_span'></span>% -> [A, B, C, D, F]</div></div> \n\n"
 
+        skip = 0
         for i, problem in enumerate(self.problems, start=1):
-            out += problem.html(number=i, answers=answers)
+            if isinstance(problem, Information):
+                skip += 1
+            out += problem.html(number=i - skip, answers=answers)
         return out
 
     def get_grade_list(self):
