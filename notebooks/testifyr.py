@@ -191,8 +191,12 @@ class Test:
 
     def get_grade_list(self):
         grades = []
+        skip = 0
         for i, problem in enumerate(self.problems, start=1):
-            n = str(i).zfill(2)
+            if isinstance(problem, Information):
+                skip += 1
+                continue
+            n = str(i - skip).zfill(2)
             if isinstance(problem, MultipleChoiceProblem):
                 grades.append(f"P-{n}-MC(3)")
             elif isinstance(problem, WorkProblem):
