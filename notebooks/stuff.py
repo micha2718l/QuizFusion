@@ -38,7 +38,7 @@ class Value(pint.Quantity):
                     unit = r"^\circ"
                 case _:
                     unit = f"{unit:~L}"
-        out = f"{'0'*self.pre_zeros}{self.magnitude:#.{self.sigfigs}g} {unit}"
+        out = f"{'0'*self.pre_zeros}{self.magnitude:#.{self.sigfigs}G} {unit}"
         return out if clean else f"${out}$"
 
     def __repr__(self):
