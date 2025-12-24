@@ -103,7 +103,11 @@ async function loadProblem(id) {
         
         // Highlight active problem
         document.querySelectorAll('.problem-item').forEach(item => item.classList.remove('active'));
-        event.target.closest('.problem-item').classList.add('active');
+        // Find the clicked item by matching the id
+        const clickedItem = document.querySelector(`.problem-item[onclick="loadProblem(${id})"]`);
+        if (clickedItem) {
+            clickedItem.classList.add('active');
+        }
     } catch (error) {
         console.error('Error loading problem:', error);
         alert('Failed to load problem');

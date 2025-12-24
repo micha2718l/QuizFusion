@@ -166,6 +166,7 @@ def main():
         print_colored("\n📍 Frontend: http://localhost:8080", Colors.OKBLUE)
         print_colored("📍 Backend API: http://localhost:8000", Colors.OKBLUE)
         print_colored("📍 API Docs: http://localhost:8000/docs", Colors.OKBLUE)
+        print_colored("📍 Backend Logs: poc/backend/backend.log", Colors.OKBLUE)
         print_colored("\n💡 Press Ctrl+C to stop the servers\n", Colors.WARNING)
         
         # Keep the script running

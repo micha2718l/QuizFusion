@@ -6,6 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
 import json
+import logging
+from datetime import datetime
 
 from models import (
     Problem, ProblemCreate, ProblemUpdate,
@@ -14,6 +16,17 @@ from models import (
 )
 from database import get_db, init_db, ProblemDB
 from executor import CodeExecutor, substitute_variables
+
+# Configure logging to file
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('backend.log'),
+        logging.StreamHandler()  # Also print to console
+    ]
+)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="QuizFusion POC API", version="0.1.0")
 
@@ -29,7 +42,9 @@ app.add_middleware(
 # Initialize database on startup
 @app.on_event("startup")
 async def startup_event():
+    logger.info("Starting QuizFusion POC API...")
     init_db()
+    logger.info("Database initialized")
 
 # Initialize code executor
 executor = CodeExecutor()
@@ -37,6 +52,7 @@ executor = CodeExecutor()
 
 @app.get("/")
 async def root():
+    logger.debug("Root endpoint accessed")
     return {
         "message": "QuizFusion POC API",
         "endpoints": {
@@ -54,7 +70,9 @@ async def list_problems(
     db: Session = Depends(get_db)
 ):
     """List all problems"""
+    logger.info(f"Listing problems (skip={skip}, limit={limit})")
     problems = db.query(ProblemDB).offset(skip).limit(limit).all()
+    logger.debug(f"Found {len(problems)} problems")
     
     # Convert to Pydantic models
     result = []
@@ -83,10 +101,13 @@ async def list_problems(
 @app.get("/api/problems/{problem_id}", response_model=Problem)
 async def get_problem(problem_id: int, db: Session = Depends(get_db)):
     """Get a specific problem by ID"""
+    logger.info(f"Getting problem {problem_id}")
     problem = db.query(ProblemDB).filter(ProblemDB.id == problem_id).first()
     if not problem:
+        logger.warning(f"Problem {problem_id} not found")
         raise HTTPException(status_code=404, detail="Problem not found")
     
+    logger.debug(f"Problem {problem_id} found: {problem.statement[:50]}...")
     problem_dict = {
         'id': problem.id,
         'type': problem.type,
@@ -110,6 +131,7 @@ async def get_problem(problem_id: int, db: Session = Depends(get_db)):
 @app.post("/api/problems", response_model=Problem)
 async def create_problem(problem: ProblemCreate, db: Session = Depends(get_db)):
     """Create a new problem"""
+    logger.info(f"Creating new problem: type={problem.type}, mode={problem.mode}")
     db_problem = ProblemDB(
         type=problem.type,
         mode=problem.mode,
@@ -127,6 +149,7 @@ async def create_problem(problem: ProblemCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_problem)
     
+    logger.info(f"Problem created with id={db_problem.id}")
     return await get_problem(db_problem.id, db)
 
 
@@ -137,8 +160,10 @@ async def update_problem(
     db: Session = Depends(get_db)
 ):
     """Update an existing problem"""
+    logger.info(f"Updating problem {problem_id}")
     db_problem = db.query(ProblemDB).filter(ProblemDB.id == problem_id).first()
     if not db_problem:
+        logger.warning(f"Problem {problem_id} not found for update")
         raise HTTPException(status_code=404, detail="Problem not found")
     
     # Update fields
@@ -162,20 +187,32 @@ async def update_problem(
 @app.delete("/api/problems/{problem_id}")
 async def delete_problem(problem_id: int, db: Session = Depends(get_db)):
     """Delete a problem"""
+    logger.info(f"Deleting problem {problem_id}")
     db_problem = db.query(ProblemDB).filter(ProblemDB.id == problem_id).first()
     if not db_problem:
+        logger.warning(f"Problem {problem_id} not found for deletion")
         raise HTTPException(status_code=404, detail="Problem not found")
     
     db.delete(db_problem)
     db.commit()
     
+    logger.info(f"Problem {problem_id} deleted successfully")
     return {"message": "Problem deleted successfully"}
 
 
 @app.post("/api/execute", response_model=CodeExecutionResponse)
 async def execute_code(request: CodeExecutionRequest):
     """Execute Python code and return namespace"""
+    logger.info(f"Executing code: {len(request.code)} characters")
+    logger.debug(f"Code to execute:\n{request.code}")
+    
     success, namespace, output, figures = executor.execute(request.code, seed=None)
+    
+    logger.info(f"Code execution {'succeeded' if success else 'failed'}")
+    if not success:
+        logger.error(f"Execution error: {output}")
+    else:
+        logger.debug(f"Namespace keys: {list(namespace.keys())}")
     
     return CodeExecutionResponse(
         success=success,
@@ -188,21 +225,25 @@ async def execute_code(request: CodeExecutionRequest):
 @app.post("/api/preview", response_model=PreviewResponse)
 async def preview_problem(request: PreviewRequest):
     """Generate a preview of the problem with variable substitution"""
+    logger.info(f"Generating preview for problem type={request.problem.type}, mode={request.problem.mode}")
     try:
         # Execute setup code if present
         namespace = {}
         if request.problem.setup_code and request.problem.mode in ['hybrid', 'code']:
+            logger.debug(f"Executing setup code for preview")
             success, namespace, output, figures = executor.execute(
                 request.problem.setup_code,
                 seed=request.seed
             )
             
             if not success:
+                logger.error(f"Setup code execution failed: {output}")
                 return PreviewResponse(
                     html="",
                     namespace={},
                     error=f"Code execution error:\n{output}"
                 )
+            logger.debug(f"Setup code executed, namespace keys: {list(namespace.keys())}")
         
         # Substitute variables in statement
         statement = substitute_variables(request.problem.statement, namespace)
@@ -240,6 +281,7 @@ async def preview_problem(request: PreviewRequest):
         
         html += "</div>"
         
+        logger.info(f"Preview generated successfully, HTML length: {len(html)} chars")
         return PreviewResponse(
             html=html,
             namespace=namespace,
@@ -247,6 +289,7 @@ async def preview_problem(request: PreviewRequest):
         )
         
     except Exception as e:
+        logger.exception(f"Preview generation error: {str(e)}")
         return PreviewResponse(
             html="",
             namespace={},
