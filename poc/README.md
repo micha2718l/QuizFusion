@@ -2,6 +2,20 @@
 
 This is a proof-of-concept for the modernized QuizFusion test creation interface.
 
+## 🚀 Quick Start (One Command!)
+
+```bash
+cd poc
+python run.py
+```
+
+Or even simpler:
+```bash
+./poc/start.sh
+```
+
+That's it! Your browser will open automatically.
+
 ## Features Demonstrated
 
 - **Three Editor Modes**: Visual, Hybrid (code + visual), and Code
