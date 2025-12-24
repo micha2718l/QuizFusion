@@ -8,7 +8,9 @@ import nbformat
 dir_in = Path("notebooks")
 dir_out = Path("out")
 template_file = "exam/index.html.j2"
-template_paths = [os.path.join(os.path.dirname(__file__), "Templates")]
+# Get the project root directory (parent of quizfusion package)
+project_root = os.path.dirname(os.path.dirname(__file__))
+template_paths = [os.path.join(project_root, "templates")]
 
 
 def extract_outputs(notebook, include_markdown=True):

@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 
-from convert_utils import open_notebook, export, detect_file_changes
+from quizfusion.convert_utils import open_notebook, export, detect_file_changes
 
 name = "kinematics_problems"
 
