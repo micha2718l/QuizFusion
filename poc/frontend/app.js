@@ -364,6 +364,19 @@ async function refreshPreview() {
         } else {
             previewDiv.innerHTML = result.html;
             
+            // Render math with KaTeX
+            if (typeof renderMathInElement !== 'undefined') {
+                renderMathInElement(previewDiv, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\\[', right: '\\]', display: true},
+                        {left: '\\(', right: '\\)', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+            
             // Show variables
             const varsDiv = document.getElementById('variablesList');
             if (Object.keys(result.namespace).length > 0) {
