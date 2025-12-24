@@ -23,31 +23,30 @@ A proof-of-concept demonstrating the modernized QuizFusion interface with:
 
 ## Running the POC
 
-### 1. Install Dependencies
+### One Command to Rule Them All! 🚀
 
 ```bash
 cd /Users/mjhaas/code/QuizFusion/poc
-pip install -r requirements.txt
+python run.py
 ```
 
-### 2. Start the Backend Server
+That's it! The launcher will:
+- ✓ Check and install dependencies
+- ✓ Start the backend server (port 8000)
+- ✓ Start the frontend server (port 8080)  
+- ✓ Open your browser automatically
+
+Press **Ctrl+C** when you're done to stop everything cleanly.
+
+### Manual Start (If You Prefer)
 
 ```bash
+# Terminal 1 - Backend
 cd backend
 python main.py
-```
 
-You should see:
-```
-INFO:     Uvicorn running on http://0.0.0.0:8000
-```
-
-### 3. Open the Frontend
-
-In a new terminal:
-
-```bash
-cd /Users/mjhaas/code/QuizFusion/poc/frontend
+# Terminal 2 - Frontend
+cd frontend
 python -m http.server 8080
 ```
 
