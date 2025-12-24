@@ -94,23 +94,34 @@ function renderProblemList() {
 // Load a specific problem
 async function loadProblem(id) {
     try {
+        console.log(`Loading problem ${id}...`);
         const response = await fetch(`${API_BASE}/api/problems/${id}`);
-        if (!response.ok) throw new Error('Failed to load problem');
+        console.log(`Response status: ${response.status}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: Failed to load problem`);
+        }
         
         currentProblem = await response.json();
+        console.log('Problem loaded:', currentProblem);
+        
         populateForm(currentProblem);
-        refreshPreview();
+        console.log('Form populated');
+        
+        await refreshPreview();
+        console.log('Preview refreshed');
         
         // Highlight active problem
         document.querySelectorAll('.problem-item').forEach(item => item.classList.remove('active'));
-        // Find the clicked item by matching the id
         const clickedItem = document.querySelector(`.problem-item[onclick="loadProblem(${id})"]`);
         if (clickedItem) {
             clickedItem.classList.add('active');
         }
+        console.log('Problem loaded successfully');
     } catch (error) {
         console.error('Error loading problem:', error);
-        alert('Failed to load problem');
+        console.error('Error stack:', error.stack);
+        alert('Failed to load problem: ' + error.message);
     }
 }
 
@@ -324,7 +335,9 @@ function toggleVariables() {
 
 // Refresh preview
 async function refreshPreview() {
+    console.log('refreshPreview called');
     const problemData = gatherFormData();
+    console.log('Form data gathered:', problemData);
     const previewDiv = document.getElementById('previewContent');
     
     try {
@@ -334,11 +347,19 @@ async function refreshPreview() {
             body: JSON.stringify({ problem: problemData })
         });
         
-        if (!response.ok) throw new Error('Preview failed');
+        console.log(`Preview response status: ${response.status}`);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Preview request failed:', errorText);
+            throw new Error('Preview failed');
+        }
         
         const result = await response.json();
+        console.log('Preview result:', result);
         
         if (result.error) {
+            console.error('Preview generation error:', result.error);
             previewDiv.innerHTML = `<div class="error">${result.error}</div>`;
         } else {
             previewDiv.innerHTML = result.html;
@@ -355,6 +376,8 @@ async function refreshPreview() {
             }
         }
     } catch (error) {
+        console.error('Preview error:', error);
+        console.error('Error stack:', error.stack);
         previewDiv.innerHTML = `<div class="error">Preview error: ${error.message}</div>`;
     }
 }
