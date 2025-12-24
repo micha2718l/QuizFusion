@@ -163,3 +163,5 @@ cython_debug/
 
 # OSX Stuff
 .DS_Store
+*.db
+backend.log
